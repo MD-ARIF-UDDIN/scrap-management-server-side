@@ -46,18 +46,49 @@ async function run() {
       .db("scrap_tools_ltd")
       .collection("purchases");
 
+      const verifyAdmin=async(req,res,next)=>{
+        const requester=req.decoded.email;
+        const requesterAccount=await userCollection.findOne({email:requester});
+        if(requesterAccount.role==='admin'){
+          next();
+        }
+          else{
+            res.status(403).send({message:'forbidden'});
+          }
+        }
+    
+
     app.get("/tool", async (req, res) => {
       const query = {};
       const cursor = toolCollection.find(query);
       const tools = await cursor.toArray();
       res.send(tools);
     });
+
+    
+
+ 
+
     app.get("/tool/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const tool = await toolCollection.findOne(query);
       res.send(tool);
     });
+
+    app.post('/tool',verifyJWT,verifyAdmin,async(req,res)=>{
+      const tool=req.body;
+      const result=await toolCollection.insertOne(tool);
+      res.send(result);
+    })
+
+    app.delete('/tool/:id',verifyJWT,verifyAdmin,async(req,res)=>{
+      const id=req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result=await toolCollection.deleteOne(query );
+      res.send(result);
+    })
+
 
 
     app.get('/user',verifyJWT,async(req,res)=>{
@@ -73,10 +104,7 @@ async function run() {
    })
 
 
-    app.put("/user/admin/:email",verifyJWT, async (req, res) => {
-      const requester=req.decoded.email;
-      const requesterAccount=await userCollection.findOne({email:requester});
-      if(requesterAccount.role==='admin'){
+    app.put("/user/admin/:email",verifyJWT,verifyAdmin,async (req, res) => {
         const email = req.params.email;
         const filter = { email: email };
         const updateDoc = {
@@ -84,10 +112,7 @@ async function run() {
         };
         const result = await userCollection.updateOne(filter, updateDoc);
         res.send(result);
-      }
-      else{
-        res.status(403).send({message:'forbidden'});
-      }    
+       
     });
 
 
@@ -153,6 +178,9 @@ async function run() {
       const result = await reviewCollection.insertOne(review);
       res.send(result);
     });
+
+  
+
 
     app.put("/tool/:id", async (req, res) => {
       const id = req.params.id;
