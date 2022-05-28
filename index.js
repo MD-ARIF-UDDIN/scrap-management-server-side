@@ -165,6 +165,7 @@ async function run() {
         return res.status(403).send({ message: "this is forbidden access" });
       }
     });
+
     app.get('/purchase/admin',verifyJWT,verifyAdmin, async (req, res) => {
       const query = {};
       const result = await purchaseCollection.find(query).toArray();
@@ -176,11 +177,11 @@ async function run() {
 
 
 
-    app.get("/purchase/:id",verifyJWT, async (req, res) => {
+    app.get("/purchase/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
-      const tool = await purchaseCollection.findOne(query);
-      res.send(tool);
+      const purchase = await purchaseCollection.findOne(query);
+      res.send(purchase);
     });
 
     app.post("/purchase", async (req, res) => {
