@@ -8,12 +8,26 @@ const {
   ObjectId,
   MongoRuntimeError,
 } = require("mongodb");
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+const corsConfig = {
+  origin: "*",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+};
+app.use(cors(corsConfig));
+app.options("*", cors(corsConfig));
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept,authorization"
+  );
+  next();
+});
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.d4sgk.mongodb.net/?retryWrites=true&w=majority`;
@@ -66,26 +80,24 @@ async function run() {
       res.send(tools);
     });
 
-    app.post("/create-payment-intent", verifyJWT, async(req, res) =>{
+    app.post("/create-payment-intent", verifyJWT, async (req, res) => {
       const tool = req.body;
       const totalAmount = tool.totalAmount;
       const amount = totalAmount;
       const paymentIntent = await stripe.paymentIntents.create({
-        amount : amount,
-        currency: 'usd',
-        payment_method_types:['card']
+        amount: amount,
+        currency: "usd",
+        payment_method_types: ["card"],
       });
-      res.send({clientSecret: paymentIntent.client_secret})
+      res.send({ clientSecret: paymentIntent.client_secret });
     });
 
-    app.get("/tool/:id",  async (req, res) => {
+    app.get("/tool/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const tool = await toolCollection.findOne(query);
       res.send(tool);
     });
-
-
 
     app.post("/tool", verifyJWT, verifyAdmin, async (req, res) => {
       const tool = req.body;
@@ -104,8 +116,6 @@ async function run() {
       const users = await userCollection.find().toArray();
       res.send(users);
     });
-
-  
 
     app.get("/admin/:email", async (req, res) => {
       const email = req.params.email;
@@ -154,7 +164,7 @@ async function run() {
       const result = await purchaseCollection.deleteOne(query);
       res.send(result);
     });
-    app.get("/purchase", verifyJWT,async (req, res) => {
+    app.get("/purchase", verifyJWT, async (req, res) => {
       const customer = req.query.customer;
       const decodedEmail = req.decoded.email;
       if (customer === decodedEmail) {
@@ -166,16 +176,11 @@ async function run() {
       }
     });
 
-    app.get('/purchase/admin',verifyJWT,verifyAdmin, async (req, res) => {
+    app.get("/purchase/admin", verifyJWT, verifyAdmin, async (req, res) => {
       const query = {};
       const result = await purchaseCollection.find(query).toArray();
       res.send(result);
-  })
-
-
-
-
-
+    });
 
     app.get("/purchase/:id", async (req, res) => {
       const id = req.params.id;
