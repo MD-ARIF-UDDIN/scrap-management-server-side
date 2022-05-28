@@ -78,7 +78,7 @@ async function run() {
       res.send({clientSecret: paymentIntent.client_secret})
     });
 
-    app.get("/tool/:id", verifyJWT,  async (req, res) => {
+    app.get("/tool/:id",  async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const tool = await toolCollection.findOne(query);
@@ -154,14 +154,7 @@ async function run() {
       const result = await purchaseCollection.deleteOne(query);
       res.send(result);
     });
-
-    app.get('/purchase', async (req, res) => {
-      const query = {};
-      const result = await purchaseCollection.find(query).toArray();
-      res.send(result);
-  })
-
-    app.get("/purchase", verifyJWT, async (req, res) => {
+    app.get("/purchase", verifyJWT,async (req, res) => {
       const customer = req.query.customer;
       const decodedEmail = req.decoded.email;
       if (customer === decodedEmail) {
@@ -172,13 +165,18 @@ async function run() {
         return res.status(403).send({ message: "forbidden access" });
       }
     });
+    app.get('/purchase/admin',verifyJWT,verifyAdmin, async (req, res) => {
+      const query = {};
+      const result = await purchaseCollection.find(query).toArray();
+      res.send(result);
+  })
 
-    
- 
 
 
 
-    app.get("/purchase/:id", async (req, res) => {
+
+
+    app.get("/purchase/:id",verifyJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const tool = await purchaseCollection.findOne(query);
