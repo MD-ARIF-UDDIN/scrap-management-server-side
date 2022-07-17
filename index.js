@@ -266,7 +266,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("Hello from scrap server!!");
+  res.send("Hello there from scrap server!!");
 });
 
 app.listen(port, () => {
