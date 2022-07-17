@@ -266,9 +266,9 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("Hello there from sddcrap ssserver!!");
+  res.send("Hello from scrap server!!");
 });
 
 app.listen(port, () => {
-  console.log(`scrap toolss app lsistening on port ${port}`);
+  console.log(`scrap tools app listening on port ${port}`);
 });
