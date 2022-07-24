@@ -233,13 +233,20 @@ async function run() {
     });
 
 
-    app.get("/cartItema/:id", async (req, res) => {
+    app.get("/cartItems/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const cartItem = await cartCollection.findOne(query);
       res.send(cartItem);
     });
 
+
+      app.delete("/cartItems/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await cartCollection.deleteOne(query);
+      res.send(result);
+    });
     // updateuser
     app.put('/updateduser', verifyJWT, async (req, res) => {
       const email = req.query.email
