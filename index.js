@@ -176,6 +176,7 @@ async function run() {
       const result = await purchaseCollection.deleteOne(query);
       res.send(result);
     });
+
     app.get("/purchase", verifyJWT, async (req, res) => {
       const customer = req.query.customer;
       const decodedEmail = req.decoded.email;
@@ -218,6 +219,27 @@ async function run() {
       res.send(result);
     });
     
+
+    app.get("/cartItems", verifyJWT,async (req, res) => {
+      const customer = req.query.customer;
+      const decodedEmail = req.decoded.email;
+      if (customer === decodedEmail) {
+        const query = { customer: customer };
+        const cartItems = await cartCollection.find(query).toArray();
+        res.send(cartItems);
+      } else {
+        return res.status(403).send({ message: "this is forbidden access" });
+      }
+    });
+
+
+    app.get("/cartItema/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const cartItem = await cartCollection.findOne(query);
+      res.send(cartItem);
+    });
+
     // updateuser
     app.put('/updateduser', verifyJWT, async (req, res) => {
       const email = req.query.email
