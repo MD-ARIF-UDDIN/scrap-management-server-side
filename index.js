@@ -176,7 +176,7 @@ async function run() {
       const result = await cartCollection.insertOne(cartItem);
       res.send(result);
     });
-    app.get("/cartItem", verifyJWT, async (req, res) => {
+    app.get("/cartItem",  async (req, res) => {
       const customer = req.query.customer;
       const decodedEmail = req.decoded.email;
       if (customer === decodedEmail) {
