@@ -123,7 +123,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/users", verifyJWT, async (req, res) => {
+    app.get("/users",  async (req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
     });
