@@ -57,7 +57,6 @@ async function run() {
     const toolCollection = client.db("scrap_tools_ltd").collection("tools");
     const userCollection = client.db("scrap_tools_ltd").collection("users");
     const reviewCollection = client.db("scrap_tools_ltd").collection("reviews");
-    const cartCollection = client.db("scrap_tools_ltd").collection("cartItems");
     const purchaseCollection = client
       .db("scrap_tools_ltd")
       .collection("purchases");
@@ -124,7 +123,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/user", verifyJWT, async (req, res) => {
+    app.get("/users", verifyJWT, async (req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
     });
@@ -176,7 +175,6 @@ async function run() {
       const result = await purchaseCollection.deleteOne(query);
       res.send(result);
     });
-
     app.get("/purchase", verifyJWT, async (req, res) => {
       const customer = req.query.customer;
       const decodedEmail = req.decoded.email;
@@ -213,40 +211,7 @@ async function run() {
       const result = await reviewCollection.insertOne(review);
       res.send(result);
     });
-    app.post("/cartItem", async (req, res) => {
-      const cartItem = req.body;
-      const result = await cartCollection.insertOne(cartItem);
-      res.send(result);
-    });
     
-
-    app.get("/cartItems", verifyJWT,async (req, res) => {
-      const customer = req.query.customer;
-      const decodedEmail = req.decoded.email;
-      if (customer === decodedEmail) {
-        const query = { customer: customer };
-        const cartItems = await cartCollection.find(query).toArray();
-        res.send(cartItems);
-      } else {
-        return res.status(403).send({ message: "this is forbidden access" });
-      }
-    });
-
-
-    app.get("/cartItems/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const cartItem = await cartCollection.findOne(query);
-      res.send(cartItem);
-    });
-
-
-      app.delete("/cartItems/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await cartCollection.deleteOne(query);
-      res.send(result);
-    });
     // updateuser
     app.put('/updateduser', verifyJWT, async (req, res) => {
       const email = req.query.email
