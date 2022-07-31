@@ -176,23 +176,7 @@ async function run() {
       const result = await cartCollection.insertOne(cartItem);
       res.send(result);
     });
-    app.get("/cartItem", async (req, res) => {
-      const customer = req.query.customer;
-      const decodedEmail = req.decoded.email;
-      if (customer === decodedEmail) {
-        const query = { customer: customer };
-        const purchases = await cartCollection.find(query).toArray();
-        res.send(purchases);
-      } else {
-        return res.status(403).send({ message: "this is forbidden access" });
-      }
-    });
-    app.delete("/cartItem/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await cartCollection.deleteOne(query);
-      res.send(result);
-    });
+    
   
 
 
