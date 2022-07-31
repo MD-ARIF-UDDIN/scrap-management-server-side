@@ -169,6 +169,13 @@ async function run() {
       res.send(reviews);
     });
 
+    app.delete("/review/:id", verifyJWT, verifyAdmin, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await reviewCollection.deleteOne(query);
+      res.send(result);
+    });
+
     app.delete("/purchase/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
