@@ -57,6 +57,7 @@ async function run() {
     const toolCollection = client.db("scrap_tools_ltd").collection("tools");
     const userCollection = client.db("scrap_tools_ltd").collection("users");
     const reviewCollection = client.db("scrap_tools_ltd").collection("reviews");
+    const cartCollection = client.db("scrap_tools_ltd").collection("cartItems");
     const purchaseCollection = client
       .db("scrap_tools_ltd")
       .collection("purchases");
@@ -168,6 +169,32 @@ async function run() {
       const reviews = await cursor.toArray();
       res.send(reviews);
     });
+
+
+    app.post("/cartItem", async (req, res) => {
+      const cartItem = req.body;
+      const result = await cartCollection.insertOne(cartItem);
+      res.send(result);
+    });
+    app.get("/cartItem", verifyJWT, async (req, res) => {
+      const customer = req.query.customer;
+      const decodedEmail = req.decoded.email;
+      if (customer === decodedEmail) {
+        const query = { customer: customer };
+        const purchases = await cartCollection.find(query).toArray();
+        res.send(purchases);
+      } else {
+        return res.status(403).send({ message: "this is forbidden access" });
+      }
+    });
+    app.delete("/cartItem/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await cartCollection.deleteOne(query);
+      res.send(result);
+    });
+  
+
 
     app.delete("/review/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
