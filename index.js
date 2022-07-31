@@ -187,7 +187,7 @@ async function run() {
       }
     });
 
-    app.get("/purchase/admin", verifyJWT, verifyAdmin, async (req, res) => {
+    app.get("/purchase/admin",  async (req, res) => {
       const query = {};
       const result = await purchaseCollection.find(query).toArray();
       res.send(result);
