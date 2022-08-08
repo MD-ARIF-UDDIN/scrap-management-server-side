@@ -307,5 +307,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`scrap tools app listening on port ${port}`);
+  console.log(`scrap tools app is listening on port ${port}`);
 });
