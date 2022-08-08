@@ -188,6 +188,13 @@ async function run() {
         return res.status(403).send({ message: "this is forbidden access" });
       }
     });
+    
+    app.delete("/cartItems/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await cartCollection.deleteOne(query);
+      res.send(result);
+    });
 
 
     app.delete("/review/:id", verifyJWT, verifyAdmin, async (req, res) => {
