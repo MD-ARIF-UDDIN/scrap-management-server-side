@@ -177,7 +177,17 @@ async function run() {
       res.send(result);
     });
     
-  
+    app.get("/cartItems", verifyJWT, async (req, res) => {
+      const customer = req.query.customer;
+      const decodedEmail = req.decoded.email;
+      if (customer === decodedEmail) {
+        const query = { customer: customer };
+        const purchases = await cartCollection.find(query).toArray();
+        res.send(purchases);
+      } else {
+        return res.status(403).send({ message: "this is forbidden access" });
+      }
+    });
 
 
     app.delete("/review/:id", verifyJWT, verifyAdmin, async (req, res) => {
@@ -229,6 +239,25 @@ async function run() {
       const result = await reviewCollection.insertOne(review);
       res.send(result);
     });
+
+    app.patch("/purchase/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const payment = req.body;
+      const filter = { _id: ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          paid: true,
+          transactionId: payment.transactionId,
+        },
+      };
+      const result = await paymentCollection.insertOne(payment);
+      console.log('hit');
+      const updatedBooking = await purchaseCollection.updateOne(
+        filter,
+        updatedDoc
+      );
+      res.send(updatedDoc);
+    });
     
     // updateuser
     app.put('/updateduser', verifyJWT, async (req, res) => {
@@ -259,24 +288,7 @@ async function run() {
       res.send(result);
     });
 
-    app.patch("/purchase/:id", verifyJWT, async (req, res) => {
-      const id = req.params.id;
-      const payment = req.body;
-      const filter = { _id: ObjectId(id) };
-      const updatedDoc = {
-        $set: {
-          paid: true,
-          transactionId: payment.transactionId,
-        },
-      };
-      const result = await paymentCollection.insertOne(payment);
-      console.log('hit');
-      const updatedBooking = await purchaseCollection.updateOne(
-        filter,
-        updatedDoc
-      );
-      res.send(updatedDoc);
-    });
+   
   } finally {
   }
 }
